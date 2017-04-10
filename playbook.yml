@@ -1,0 +1,26 @@
+---
+  - hosts: wordpress
+    remote_user: nesello
+    become: yes
+    tasks:
+      - name: "instalar o pip"
+        easy_install:
+          name=pip
+      - name: "instalar o docker-py"
+        pip:
+          name=docker-py
+          state=present
+      - name: "execute o container de banco de dados"
+        docker_container:
+          name: banco
+          image: mysql:5.6
+          env:
+            MYSQL_ROOT_PASSWORD: senha123
+      - name: "execute o container do wordpress"
+        docker_container:
+          name: wordpress
+          image: wordpress
+          links:
+            - "banco:mysql"
+          ports:
+            - "80:80"
